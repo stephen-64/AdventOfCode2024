@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+# Input Files to Ignore
+input.txt
+test_input.txt
+
+#VS Code Configs
+.vscode
+
+#Binary Files
+bin
