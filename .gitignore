@@ -34,6 +34,7 @@
 # Input Files to Ignore
 input.txt
 test_input.txt
+test_input2.txt
 
 #VS Code Configs
 .vscode

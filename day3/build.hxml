@@ -1,0 +1,16 @@
+--class-path src
+#--dce full
+#-D analyzer-optimize
+#--interp
+--each
+
+--hl bin/main.hl
+--main Main
+
+# --next
+# --cpp bin/cpp/main
+# --main Main
+
+# --next
+# --java bin/java
+# --main Main
