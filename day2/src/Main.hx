@@ -21,47 +21,7 @@ class Main
 
         for (row in rowByRowFile)
         {   
-            if (row != "")
-            {
-                var numbers = row.split(' ');
-                var numberList:List<Int> = new List<Int>();
-                var safe:Bool = true;
-                var skipSafe:Bool = true;
-                var singleSkip:Bool = true;
-                var currentNumberState:NumberState = NumberState.start;
-                for (number in 0...numbers.length)
-                {
-                    var currentNumber:Int = Std.parseInt(numbers[number]);
-                    numberList.add(currentNumber);
-                    if (number < numbers.length -1)
-                    {
-                        var difference:Int = Std.parseInt(numbers[number]) - Std.parseInt(numbers[number + 1]);
-                        var absDistance:Float = Math.abs(difference);
-                        if (absDistance > 3)
-                        {
-                            safe = false;
-                            if (singleSkip)
-                            {
-
-                            }
-                        }
-                        var numberState:NumberState = isNegative(difference);
-                        if (currentNumberState == NumberState.start)
-                        {
-                            currentNumberState = numberState;
-                        }
-                        if (currentNumberState != numberState)
-                        {
-                            safe = false;
-                            if (singleSkip)
-                            {
-
-                            }
-                        }
-                    }
-                }
-                nuclearValues.push({numberList: numberList, safe: safe, skipSafe: skipSafe});
-            }
+            runLoop(row, nuclearValues);
         }
 
         var safeCount:Int = 0;
@@ -80,6 +40,89 @@ class Main
 
         Sys.println('The number of safe entries is $safeCount');
         Sys.println('The number of safe entries with a skip is $skipSafeCount');
+    }
+
+    private static function runLoop(row:String, nuclearValues:Array<NuclearValuesWithSafety>):Void
+    {
+        if (row != "")
+        {
+            var numbers = row.split(' ');
+            var numberList:List<Int> = new List<Int>();
+            var safe:Bool = true;
+            var singleSkip:Bool = true;
+            var currentNumberState:NumberState = NumberState.start;
+            for (number in 0...numbers.length)
+            {
+                var currentNumber:Int = Std.parseInt(numbers[number]);
+                numberList.add(currentNumber);
+                if (number < numbers.length -1)
+                {
+                    var difference:Int = Std.parseInt(numbers[number]) - Std.parseInt(numbers[number + 1]);
+                    var absDistance:Float = Math.abs(difference);
+                    if (absDistance > 3)
+                    {
+                        safe = false;
+                        singleSkip = loopBool(clone(numbers, number)) || loopBool(clone(numbers, number + 1));
+                        break;
+                    }
+                    var numberState:NumberState = isNegative(difference);
+                    if (currentNumberState == NumberState.start)
+                    {
+                        currentNumberState = numberState;
+                    }
+                    if (currentNumberState != numberState)
+                    {
+                        safe = false;
+                        singleSkip = loopBool(clone(numbers, number)) || loopBool(clone(numbers, number + 1));
+                        break;
+                    }
+                }
+            }
+            nuclearValues.push({numberList: numberList, safe: safe, skipSafe: singleSkip});
+        }
+    }
+
+    private static function clone(currentArray:Array<String>, indexToSkip:Int):Array<String> 
+    {
+        var newArray:Array<String> = [];
+        for (x in 0...currentArray.length)
+        {
+            if (x != indexToSkip)
+            {
+                newArray.push(currentArray[x]);
+            }
+        }
+        return newArray;
+    }
+
+    private static function loopBool(numbers:Array<String>):Bool
+    {
+        var singleSkip:Bool = true;
+        var currentNumberState:NumberState = NumberState.start;
+        for (number in 0...numbers.length)
+        {
+            if (number < numbers.length -1)
+            {
+                var difference:Int = Std.parseInt(numbers[number]) - Std.parseInt(numbers[number + 1]);
+                var absDistance:Float = Math.abs(difference);
+                if (absDistance > 3)
+                {
+                    singleSkip = false;
+                    break;
+                }
+                var numberState:NumberState = isNegative(difference);
+                if (currentNumberState == NumberState.start)
+                {
+                    currentNumberState = numberState;
+                }
+                if (currentNumberState != numberState)
+                {
+                    singleSkip = false;
+                    break;
+                }
+            }
+        }
+        return singleSkip;
     }
 
     private static function isNegative(numberToCheck:Int):NumberState
